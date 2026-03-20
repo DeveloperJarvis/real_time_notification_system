@@ -34,4 +34,26 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from loguru import logger
+import sys
+from config.settings import settings
 
+
+def get_logger():
+
+    logger.remove()
+
+    logger.add(
+        sys.stdout,
+        level=settings.LOG_LEVEL,
+        format="{time} | {level} | {message}"
+    )
+
+    logger.add(
+        settings.LOG_FILE,
+        rotation="10 MB",
+        retention="7 days",
+        level=settings.LOG_LEVEL
+    )
+
+    return logger

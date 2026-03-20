@@ -34,4 +34,37 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import uuid
 
+from broker.publisher import publish_event
+from broker.topics import PUSH_TOPIC, EMAIL_TOPIC, SMS_TOPIC
+from notification_api.schemas.notification_schema import NotificationRequest
+from utils.logger import get_logger
+
+logger = get_logger()
+
+
+async def publish_notification(request: NotificationRequest):
+
+    event = {
+        "notification_id": str(uuid.uuid4()),
+        "user_id": request.user_id,
+        "event_type": request.event_type,
+        "payload": request.payload
+    }
+
+    if request.channel == "push":
+        topic = PUSH_TOPIC
+    
+    elif request.channel == "email":
+        topic = EMAIL_TOPIC
+    
+    elif request.channel == "sms":
+        topic = SMS_TOPIC
+    
+    else:
+        raise ValueError("Invalid notification channel")
+
+    await publish_event(topic, event)
+
+    logger.info(f"Notification published to {topic}")

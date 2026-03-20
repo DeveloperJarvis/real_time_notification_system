@@ -34,4 +34,50 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
+from models.notification_log import NotificationLog
+
+
+class NotificationRepository:
+
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
+    async def create_notification_log(self,
+                            log: NotificationLog):
+        
+        self.db.add(log)
+        await self.db.commit()
+        await self.db.refresh(log)
+
+        return log
+    
+    async def get_user_notifications(self, user_id: str):
+
+        result = await self.db.execute(
+            select(NotificationLog).where(
+                NotificationLog.user_id == user_id
+            )
+        )
+
+        return result.scalars().all()
+    
+    async def update_status(self, notification_id: str,
+                            status: str):
+        
+        result = await self.db.execute(
+            select(NotificationLog).where(
+                NotificationLog.notification_id == notification_id
+            )
+        )
+
+        log = result.scalar_one_or_none()
+
+        if log:
+            log.status = status
+            await self.db.commit()
+            await self.db.refresh(log)
+        
+        return log

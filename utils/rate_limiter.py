@@ -34,4 +34,31 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import time
+from collections import defaultdict
+from config.constants import DEFAULT_RATE_LIMIT, RATE_LIMIT_WINDOW
 
+
+class RateLimiter:
+
+    def __init__(self):
+        self.requests = defaultdict(list)
+    
+    def is_allowed(self, key: str):
+
+        now = time.time()
+        window_start = now - RATE_LIMIT_WINDOW
+
+        timestamps = self.requests[key]
+
+        # remove expired timestamps
+        self.requests[key] = [
+            ts for ts in timestamps if ts > window_start
+        ]
+
+        if len(self.requests[key]) >= DEFAULT_RATE_LIMIT:
+            return False
+        
+        self.requests[key].append(now)
+
+        return True

@@ -34,4 +34,58 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import asyncio
+import uvicorn
 
+from notification_api.app import create_app
+from workers.notification_worker import start_notification_worker
+from workers.email_worker import start_email_worker
+from workers.sms_worker import start_sms_worker
+
+from websocket_gateway.gateway_server import app as websocket_app
+from config.settings import settings
+from utils.logger import get_logger
+from broker.kafka_client import stop_producer
+
+logger = get_logger()
+api_app = create_app()
+
+
+async def start_workers():
+    """
+    Start background Kafka workers
+    """
+
+    logger.info("Starting notification workers...")
+    await asyncio.gather(
+        start_notification_worker(),
+        start_email_worker(),
+        start_sms_worker(),
+    )
+
+
+async def start_api():
+    """
+    Start FastAPI HTTP server
+    """
+    
+    config = uvicorn.Config(
+        api_app,
+        host=settings.API_HOST,
+        port=int(settings.API_PORT),
+        log_level=settings.LOG_LEVEL.lower(),
+    )
+    server = uvicorn.Server(config)
+    await server.serve()
+
+
+async def main():
+    logger.info("Starting Real-Time Notification System")
+    try:
+        await start_api()
+    finally:
+        await stop_producer()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

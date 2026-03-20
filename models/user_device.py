@@ -34,4 +34,25 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from sqlalchemy import Column, String, DateTime
+from sqlalchemy.sql import func
+# from sqlalchemy.ext.declarative import declarative_base
 
+# Base = declarative_base()
+from database.db import Base
+
+
+class UserDevice(Base):
+    __tablename__ = "user_devices"
+
+    user_id = Column(String, primary_key=True, index=True)
+    device_id = Column(String, primary_key=True, index=True)
+
+    push_token = Column(String, nullable=False)
+    platform = Column(String, nullable=False)
+
+    last_active = Column(DateTime(timezone=True),
+                         server_default=func.now())
+    
+    def __repr__(self):
+        return f"<UserDevice user_id={self.user_id}> device_id={self.device_id}"

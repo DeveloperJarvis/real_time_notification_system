@@ -11,26 +11,70 @@ services:
     env_file:
       - .env
     depends_on:
-      - kafka
-      - postgres
-      - redis
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
     volumes:
       - .:/app
       - ./logs:/app/logs
   
+  websocket:
+    build: .
+    command: uvicorn websocket_gateway.gateway_server:app --host 0.0.0.0 --port 9000
+    ports:
+      - "9000:9000"
+    depends_on:
+      - kafka
+
+  worker_push:
+    build: .
+    command: python -m workers.notification_worker
+    depends_on:
+      - kafka
+  
+  worker_email:
+    build: .
+    command: python -m workers.email_worker
+    depends_on:
+      - kafka
+  
+  worker_sms:
+    build: .
+    command: python -m workers.sms_worker
+    depends_on:
+      - kafka
+    
+  
   kafka:
-    image: bitnami/kafka:latest
+    # image: bitnami/kafka:latest
+    image: apache/kafka:latest
     container_name: kafka
     ports:
       - "9092:9092"
     environment:
-      - KAFKA_CFG_NODE_ID=0
-      - KAFKA_CFG_PROCESS_ROLES=broker.controller
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://akfka:9092
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
   
   postgres:
     image: postgres:15
@@ -38,9 +82,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB: notifications
-      - POSTGRES_USER: postgres
-      - POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notifications
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
   
@@ -52,3 +96,4 @@ services:
 
 volumes:
   postgres_data:
+  kafka_data:

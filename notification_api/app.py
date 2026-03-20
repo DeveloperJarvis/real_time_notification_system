@@ -34,4 +34,32 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from fastapi import FastAPI
+from notification_api.routes.notification_routes import router as notification_router
+from notification_api.middleware.auth_middleware import AuthMiddleware
+from utils.logger import get_logger
+from config.settings import settings
 
+logger = get_logger()
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title=settings.APP_NAME,
+        version="1.0.0"
+    )
+
+    # Middleware
+    app.add_middleware(AuthMiddleware)
+
+    # Routes
+    app.include_router(notification_router,
+                       prefix="/notifications")
+    
+    @app.get("/health")
+    async def health_check():
+        return {"status": "ok"}
+    
+    logger.info("Notification API initialized")
+
+    return app

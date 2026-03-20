@@ -34,4 +34,4 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
-
+from .notification_schema import NotificationRequest

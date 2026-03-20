@@ -34,4 +34,6 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
-
+from .chat_service_producer import publish_chat_notification
+from .order_service_producer import publish_order_notification
+from .payment_service_producer import publish_payment_notification

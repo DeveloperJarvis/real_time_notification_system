@@ -34,4 +34,36 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from typing import Dict
+from fastapi import WebSocket
+from utils.logger import get_logger
 
+logger = get_logger()
+
+
+class ConnectionManager:
+
+    def __init__(self):
+        self.active_connections: Dict[str, WebSocket] = {}
+    
+    async def connect(self, user_id: str,
+                      websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections[user_id] = websocket
+        logger.info(f"User connected: {user_id}")
+    
+    def disconnect(self, user_id: str):
+        if user_id in self.active_connections:
+            del self.active_connections[user_id]
+            logger.info(f"User disconnected: {user_id}")
+    
+    async def send_notification(self, user_id: str,
+                                message: dict):
+        websocket = self.active_connections.get(user_id)
+
+        if websocket:
+            await websocket.send_json(message)
+    
+    async def broadcast(self, message: dict):
+        for websocket in self.active_connections.values():
+            await websocket.send_json(message)

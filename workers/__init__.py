@@ -34,4 +34,6 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
-
+from .notification_worker import start_notification_worker
+from .email_worker import start_email_worker
+from .sms_worker import start_sms_worker

@@ -34,4 +34,25 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from broker.kafka_client import get_consumer
+from broker.topics import SMS_TOPIC
+from delivery.sms_delivery_service import send_sms
+from utils.logger import get_logger
 
+logger = get_logger()
+
+
+async def start_sms_worker():
+    consumer = await get_consumer(SMS_TOPIC)
+    logger.info("SMS worker started")
+    try:
+        async for message in consumer:
+            event = message.value
+            try:
+                await send_sms(event)
+            except Exception as e:
+                logger.error(f"SMS send failed: {e}")
+    except Exception as e:
+        logger.error(f"Worker crashed: {e}")
+    finally:
+        await consumer.stop()

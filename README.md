@@ -4,6 +4,74 @@ A scalable **Real-Time Push Notification System** built using a **Publish–Subs
 
 ---
 
+# How to Run the Project
+
+## Docker compose build
+
+```bash
+docker compose up --build
+# up: starts all services
+# --build: rebuilds your images (important after code changes)
+docker compose up -d --build
+# -d: run in background (detached mode)
+
+# Stop everything
+docker compose down
+```
+
+### 1️⃣ Setup
+
+```bash
+# setup.py
+pip install -e .
+# install dependencies
+pip install -r requirements.txt
+```
+
+### 2️⃣ Start infrastructure
+
+```bash
+docker-compose up
+# This starts
+# - Kafka
+# - PostgreSQL
+# - Redis
+```
+
+### 3️⃣ Run the notification system
+
+```bash
+python main.py
+```
+
+## API Example
+
+```bash
+POST /notifications/send
+```
+
+Headers
+
+```bash
+x-api-key: super-secret-key
+```
+
+Body
+
+```json
+{
+  "user_id": "123",
+  "event_type": "NEW_MESSAGE",
+  "channel": "push",
+  "payload": {
+    "sender": "user456",
+    "message": "Hello!"
+  }
+}
+```
+
+---
+
 ## ✨ Overview
 
 This project demonstrates the **Low-Level Design (LLD)** of a notification system capable of delivering real-time push notifications to millions of users. It uses a **decoupled microservice architecture** where producers publish events and consumers process and deliver notifications asynchronously.
@@ -32,13 +100,39 @@ Message Broker (Pub/Sub)
       │
  ┌────┴───────────────┐
  ▼                    ▼
-Notification Workers
+Notification        Workers
       │
       ▼
 Delivery Service
       │
       ▼
 Push Gateway (FCM / APNS / WebSockets)
+      │
+      ▼
+User Devices
+```
+
+---
+
+# Final Architecture
+
+```
+Producers Services
+      │
+      ▼
+Notification API
+      │
+      ▼
+Kafka Topics
+      │
+      ▼
+    Workers
+      │
+      ▼
+Delivery Services
+      │
+      ▼
+Push / Email / SMS
       │
       ▼
 User Devices

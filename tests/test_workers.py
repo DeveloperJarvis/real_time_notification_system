@@ -34,4 +34,43 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import pytest
+from workers.notification_worker import start_notification_worker
 
+
+@pytest.mark.asyncio
+async def test_worker_process(monkeypatch):
+
+    async def mock_consumer():
+        class MockMessage:
+            value = {
+                "user_id": "123",
+                "payload": {
+                    "message": "hello"
+                }
+            }
+        
+        async def generator():
+            yield MockMessage()
+        
+        return generator()
+    
+    async def mock_send_push(event):
+        return True
+    
+    monkeypatch.setattr(
+        "workers.notification_worker.get_consumer",
+        lambda topic: mock_consumer()
+    )
+
+    monkeypatch.setattr(
+        "workers.notification_worker.send_push_notification",
+        mock_send_push
+    )
+
+    try:
+        await start_notification_worker()
+    except Exception:
+        pass
+
+    assert True

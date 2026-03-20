@@ -34,4 +34,50 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import pytest
 
+from delivery.push_delivery_service import send_push_notification
+from delivery.email_delivery_service import send_email
+from delivery.sms_delivery_service import send_sms
+
+
+@pytest.mark.asyncio
+async def test_push_delivery():
+
+    event = {
+        "user_id": "123",
+        "payload": {
+            "message": "Test Push"
+        }
+    }
+
+    result = await send_push_notification(event)
+    assert result is True
+
+
+@pytest.mark.asyncio
+async def test_email_delivery():
+
+    event = {
+        "user_id": "123",
+        "payload": {
+            "message": "Test Email"
+        }
+    }
+
+    result = await send_email(event)
+    assert result is True
+
+
+@pytest.mark.asyncio
+async def test_sms_delivery():
+
+    event = {
+        "user_id": "123",
+        "payload": {
+            "message": "Test SMS"
+        }
+    }
+
+    result = await send_sms(event)
+    assert result is True

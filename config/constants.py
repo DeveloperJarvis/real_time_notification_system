@@ -35,3 +35,19 @@
 # imports
 # --------------------------------------------------
 
+
+# Notification Channels
+PUSH_CHANNEL = "push"
+EMAIL_CHANNEL = "email"
+SMS_CHANNEL = "sms"
+
+# Retry Configuration
+MAX_RETRIES = 3
+RETRY_DELAYS = [5, 30, 300]
+
+# Rate Limiting
+DEFAULT_RATE_LIMIT = 100
+RATE_LIMIT_WINDOW = 60
+
+# Websocket
+MAX_CONNECTIONS = 10000

@@ -34,4 +34,5 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
-
+from .kafka_client import get_producer, get_consumer
+from .publisher import publish_event

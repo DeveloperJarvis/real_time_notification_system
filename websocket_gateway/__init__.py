@@ -34,4 +34,5 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
-
+from .gateway_server import websocket_endpoint
+from .connection_manager import ConnectionManager

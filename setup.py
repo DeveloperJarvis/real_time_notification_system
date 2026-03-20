@@ -35,12 +35,12 @@
 # imports
 # --------------------------------------------------
 from setuptools import setup, find_packages
-.
-.
+
+
 setup(
-    name="",
+    name="real-time-notification-system",
     version="0.1.0",
-    description="",
+    description="Scalable Real-Time Notification System using Pub/Sub architecture",
     author="Developer Jarvis",
     author_email="developerjarvis@github.com",
     license="GPL-3.0-or-later",
@@ -48,13 +48,28 @@ setup(
         exclude=("tests*", "logs*",)
     ),
     python_requires=">=3.9",
-    install_requires=[],
+    install_requires=[
+        "fastapi",
+        "uvicorn",
+        "pydantic",
+        "python-dotenv",
+        "aiokafka",
+        "aio-pika",
+        "asyncpg",
+        "SQLAlchemy",
+        "redis",
+        "websockets",
+        "tenacity",
+        "loguru",
+    ],
     extras_require={
         "dev": [
             "pytest",
+            "pytest-asyncio",
             "black",
             "flake8",
             "mypy",
+            "httpx",
         ]
     },
     classifiers=[
@@ -63,4 +78,3 @@ setup(
         "Operating System :: OS Independent",
     ],
 )
-.

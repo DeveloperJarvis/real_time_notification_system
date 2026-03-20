@@ -34,4 +34,32 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import asyncio
+from functools import wraps
+from config.constants import MAX_RETRIES, RETRY_DELAYS
+from utils.logger import get_logger
 
+logger = get_logger()
+
+
+def retry_async(func):
+
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+
+        for attempt in range(MAX_RETRIES):
+            try:
+                return await func(*args, **kwargs)
+            
+            except Exception as e:
+
+                if attempt == MAX_RETRIES - 1:
+                    logger.error(f"Max retries reached: {e}")
+                    raise
+
+                delay = RETRY_DELAYS[attempt]
+                logger.warning(f"Retrying in {delay}s due to {e}")
+
+                await asyncio.sleep(delay)
+    
+    return wrapper

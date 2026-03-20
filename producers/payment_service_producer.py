@@ -34,4 +34,22 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import uuid
+from broker.publisher import publish_event
+from broker.topics import PUSH_TOPIC
 
+
+async def publish_payment_notification(user_id: str,
+                        payment_id: str, amount: float):
+    
+    event = {
+        "notification_id": str(uuid.uuid4()),
+        "event_type": "PAYMENT_SUCCESS",
+        "user_id": user_id,
+        "payload": {
+            "payment_id": payment_id,
+            "amount": amount
+        }
+    }
+
+    await publish_event(PUSH_TOPIC, event)

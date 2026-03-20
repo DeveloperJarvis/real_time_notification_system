@@ -34,4 +34,8 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from config.settings import settings
 
+PUSH_TOPIC = settings.KAFKA_NOTIFICATION_TOPIC
+EMAIL_TOPIC = settings.KAFKA_EMAIL_TOPIC
+SMS_TOPIC = settings.KAFKA_SMS_TOPIC

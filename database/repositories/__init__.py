@@ -34,4 +34,5 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
-
+from .device_repository import DeviceRepository
+from .notification_repository import NotificationRepository

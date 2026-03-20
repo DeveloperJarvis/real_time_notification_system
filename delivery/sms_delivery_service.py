@@ -34,4 +34,20 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from utils.logger import get_logger
+from utils.retry import retry_async
 
+logger = get_logger()
+
+
+@retry_async
+async def send_sms(event: dict):
+
+    user_id = event["user_id"]
+    payload = event["payload"]
+
+    logger.info(
+        f"SMS sent to user {user_id}: {payload}"
+    )
+
+    return True

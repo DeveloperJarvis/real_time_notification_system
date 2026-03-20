@@ -51,7 +51,7 @@ call :create_py_file "%ROOT%\producers\order_service_producer.py"
 call :create_py_file "%ROOT%\producers\payment_service_producer.py"
 
 call :create_py_file "%ROOT%\broker\__init__.py"
-call :create_py_file "%ROOT%\broker\kafta_client.py"
+call :create_py_file "%ROOT%\broker\kafka_client.py"
 call :create_py_file "%ROOT%\broker\topics.py"
 call :create_py_file "%ROOT%\broker\publisher.py"
 
@@ -102,6 +102,7 @@ call :create_file "%ROOT%\docs\system_design.md"
 call :create_file "%ROOT%\requirements.txt"
 call :create_file "%ROOT%\README.md"
 call :create_file "%ROOT%\LICENSE"
+call :create_file "%ROOT%\Dockerfile"
 call :create_file "%ROOT%\docker-compose.yml"
 call :create_file "%ROOT%\.env"
 

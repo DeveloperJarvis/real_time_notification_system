@@ -34,4 +34,22 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import uuid
+from broker.publisher import publish_event
+from broker.topics import PUSH_TOPIC
 
+
+async def publish_order_notification(user_id: str,
+                            order_id: str, status: str):
+    
+    event = {
+        "notification_id": str(uuid.uuid4()),
+        "event_type": "ORDER_UPDATE",
+        "user_id": user_id,
+        "payload": {
+            "order_id": order_id,
+            "status": status
+        }
+    }
+
+    await publish_event(PUSH_TOPIC, event)

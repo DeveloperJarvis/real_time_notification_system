@@ -34,4 +34,21 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from utils.logger import get_logger
+from utils.retry import retry_async
 
+logger = get_logger()
+
+
+@retry_async
+async def send_push_notification(event: dict):
+
+    user_id = event["user_id"]
+    payload = event["payload"]
+
+    # Simulate push delivery
+    logger.info(
+        f"Push notification sent to user {user_id}: {payload}"
+    )
+
+    return True

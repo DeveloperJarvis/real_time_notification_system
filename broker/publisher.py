@@ -34,4 +34,13 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from broker.kafka_client import get_producer
+from utils.logger import get_logger
 
+logger = get_logger()
+
+
+async def publish_event(topic: str, event: dict):
+    producer = await get_producer()
+    await producer.send_and_wait(topic, event)
+    logger.info(f"Event published to {topic}: {event}")

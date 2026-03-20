@@ -34,4 +34,18 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from fastapi import APIRouter
+from notification_api.schemas.notification_schema import NotificationRequest
+from notification_api.services.publish_service import publish_notification
+from utils.logger import get_logger
 
+router = APIRouter()
+logger = get_logger()
+
+
+@router.post("/send")
+async def send_notification(request: NotificationRequest):
+    await publish_notification(request)
+    return {
+        "message": "Notification queued successfully"
+    }

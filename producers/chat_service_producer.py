@@ -34,4 +34,22 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import uuid
+from broker.publisher import publish_event
+from broker.topics import PUSH_TOPIC
 
+
+async def publish_chat_notification(user_id: str,
+                            sender: str, message: str):
+    
+    event = {
+        "notification_id": str(uuid.uuid4()),
+        "event_type": "NEW_MESSAGE",
+        "user_id": user_id,
+        "payload": {
+            "sender": sender,
+            "message_preview": message
+        }
+    }
+
+    await publish_event(PUSH_TOPIC, event)

@@ -34,4 +34,27 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from sqlalchemy import Column, String, DateTime, Integer
+from sqlalchemy.sql import func
+# from sqlalchemy.ext.declarative import declarative_base
 
+# Base = declarative_base()
+from database.db import Base
+
+
+class NotificationLog(Base):
+    __tablename__ = "notification_logs"
+
+    notification_id = Column(String, primary_key=True, index=True)
+    user_id = Column(String, index=True)
+
+    channel = Column(String)
+    status = Column(String)
+
+    retry_count = Column(Integer, default=0)
+
+    created_at = Column(DateTime(timezone=True),
+                        server_default=func.now())
+    
+    def __repr__(self):
+        return f"<NotificationLog id={self.notification_id} status={self.status}>"

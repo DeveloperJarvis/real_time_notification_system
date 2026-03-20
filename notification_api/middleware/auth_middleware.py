@@ -34,4 +34,23 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.responses import JSONResponse
+from fastapi import Request
+from config.settings import settings
 
+
+class AuthMiddleware(BaseHTTPMiddleware):
+    
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path == "/health":
+            return await call_next(request)
+        api_key = request.headers.get("x-api-key")
+        if not api_key or api_key != settings.API_KEY:
+            return JSONResponse(
+                status_code=401,
+                content={"error": "Unauthorized"}
+            )
+        
+        response = await call_next(request)
+        return response

@@ -34,4 +34,53 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import json
+import asyncio
+from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
+from config.settings import settings
 
+producer = None
+
+
+async def get_producer():
+    global producer
+    if producer is None:
+        producer = AIOKafkaProducer(
+            bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
+            value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+            retry_backoff_ms=1000,
+            request_timeout_ms=30000
+        )
+
+        # retry loop
+        for i in range(3):
+            try:
+                await producer.start()
+                break
+            except Exception:
+                print(f"Retrying Kafta connection... {i}")
+                await asyncio.sleep(2)
+    return producer
+
+
+async def stop_producer():
+    global producer
+    if producer:
+        await producer.stop()
+        producer = None
+
+
+async def get_consumer(topic: str):
+    consumer = AIOKafkaConsumer(
+        topic,
+        bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
+        value_deserializer=lambda v: json.loads(v.decode("utf-8")),
+        group_id="notification-workers"
+    )
+    await consumer.start()
+    return consumer
+
+
+async def stop_consumer(consumer):
+    if consumer:
+        await consumer.stop()

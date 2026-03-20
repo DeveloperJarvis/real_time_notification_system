@@ -34,4 +34,25 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from broker.kafka_client import get_consumer
+from broker.topics import EMAIL_TOPIC
+from delivery.email_delivery_service import send_email
+from utils.logger import get_logger
 
+logger = get_logger()
+
+
+async def start_email_worker():
+    consumer = await get_consumer(EMAIL_TOPIC)
+    logger.info("Email worker started")
+    try:
+        async for message in consumer:
+            event = message.value
+            try:
+                await send_email(event)
+            except Exception as e:
+                logger.error(f"Email send failed: {e}")
+    except Exception as e:
+        logger.error(f"Worker crashed: {e}")
+    finally:
+        await consumer.stop()

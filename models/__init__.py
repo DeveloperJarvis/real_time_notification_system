@@ -34,4 +34,5 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
-
+from .user_device import UserDevice
+from .notification_log import NotificationLog

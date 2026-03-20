@@ -34,4 +34,25 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from websocket_gateway.connection_manager import ConnectionManager
+from utils.logger import get_logger
 
+logger = get_logger()
+
+app = FastAPI()
+
+manager = ConnectionManager()
+
+
+@app.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+
+    await manager.connect(user_id, websocket)
+
+    try:
+        while True:
+            await websocket.receive_text()
+    
+    except WebSocketDisconnect:
+        manager.disconnect(user_id)

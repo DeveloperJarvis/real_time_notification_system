@@ -9,7 +9,9 @@ import tokenize
 PROJECT_ROOT = "."          # Root folder to traverse
 OUTPUT_FILE = "code.txt"    # Output file
 INCLUDE_EXTENSIONS = {".py"}    # file types to include
-INCLUDE_FILES = {}
+INCLUDE_FILES = {
+    "docker-compose.yml"
+}
 EXCLUDE_DIRS = {
     ".git",
     "__pycache__",

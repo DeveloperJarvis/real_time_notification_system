@@ -34,4 +34,16 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from pydantic import BaseModel
+from typing import Dict, Optional
 
+
+class NotificationRequest(BaseModel):
+
+    user_id: str
+    event_type: str
+    channel: str
+
+    payload: Dict
+
+    priority: Optional[str] = "normal"
